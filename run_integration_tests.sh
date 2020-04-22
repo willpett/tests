@@ -146,32 +146,32 @@ while [  $i -lt ${#tests[@]} ]; do
             fi
         done
 
-        cd ..
-    fi
-
-    # check if a script exited with an error
-    if [ "${status[$i]}" != 0 ]; then
-        errs=("${status[$i]}")
-    fi
-
-    # failure if we have an error message
-    if [ ${#errs[@]} -gt 0 ]; then
-        if [ -f XFAIL ] ; then
-            ((xfailed++))
-            printf ">>>> Test failed: $t (expected)\n"
-        else
-            ((failed++))
-            printf ">>>> Test failed: $t\n"
+        # check if a script exited with an error
+        if [ "${status[$i]}" != 0 ]; then
+            errs=("${status[$i]}")
         fi
-        for errmsg in "${errs[@]}"; do
-            printf "\t$errmsg\n"
-        done
-    else
-        ((pass++))
-        printf "#### Test passed: $t\n"
-    fi
 
-    ((i++))
+        # failure if we have an error message
+        if [ ${#errs[@]} -gt 0 ]; then
+            if [ -f XFAIL ] ; then
+                ((xfailed++))
+                printf ">>>> Test failed: $t (expected)\n"
+            else
+                ((failed++))
+                printf ">>>> Test failed: $t\n"
+            fi
+            for errmsg in "${errs[@]}"; do
+                printf "\t$errmsg\n"
+            done
+        else
+            ((pass++))
+            printf "#### Test passed: $t\n"
+        fi
+
+        cd ..
+
+        ((i++))
+    fi
 done
 
 
