@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git submodule update --init --recursive
+
 if [ -z "$1" ] ; then
     printf "Please supply the full path to rb as first argument.\n\n"
     printf "Examples:\n"
