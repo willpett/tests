@@ -41,6 +41,8 @@ else
     rb_exec="$@"
 fi
 
+export rb_exec
+
 
 if ! ${rb_exec} --help > /dev/null 2>&1 ; then
     echo "RevBayes command '${rb_exec}' seems not to work!\n"
@@ -49,6 +51,32 @@ fi
 
 tests=()
 status=()
+
+for t in revbayes.github.io/tutorials/*/test.sh; do
+    testname=`echo $t | cut -d '/' -f 2-3`
+    dirname=`echo $t | cut -d '/' -f 1-3`
+
+    cd $dirname
+
+    tests+=($testname)
+
+    sh test.sh
+    res="$?"
+    if [ $res = 1 ]; then
+        res="error: $f"
+        break
+    elif [ $res = 139 ]; then
+        res="segfault: $f"
+        break
+    elif [ $res != 0 ]; then
+        res="error $res: $f"
+        break
+    fi
+
+    status+=("$res")
+
+    cd -
+done
 
 for t in test_*; do
     testname=`echo $t | cut -d _ -f 2-`
@@ -97,24 +125,29 @@ pass=0
 i=0
 while [  $i -lt ${#tests[@]} ]; do
     t=${tests[$i]}
-    cd test_$t
 
-    # check if output matches expected output
-    errs=()
-    exp_out_dir="output_expected"
-    # Sebastian: For now we only use single cores until we fix Travis mpirun
-#    if [ "${mpi}" = "true" ]; then
-#        if [ -d "output_expected_mpi" ]; then
-#            exp_out_dir="output_expected_mpi"
-#        fi
-#    fi
-    for f in $(ls ${exp_out_dir}); do
-        if [ ! -e output/$f ]; then
-            errs+=("missing:  $f")
-        elif ! diff output/$f ${exp_out_dir}/$f > /dev/null; then
-            errs+=("mismatch: $f")
-        fi
-    done
+    if [ -d test_$t ]; then
+        cd test_$t
+
+        # check if output matches expected output
+        errs=()
+        exp_out_dir="output_expected"
+        # Sebastian: For now we only use single cores until we fix Travis mpirun
+    #    if [ "${mpi}" = "true" ]; then
+    #        if [ -d "output_expected_mpi" ]; then
+    #            exp_out_dir="output_expected_mpi"
+    #        fi
+    #    fi
+        for f in $(ls ${exp_out_dir}); do
+            if [ ! -e output/$f ]; then
+                errs+=("missing:  $f")
+            elif ! diff output/$f ${exp_out_dir}/$f > /dev/null; then
+                errs+=("mismatch: $f")
+            fi
+        done
+
+        cd ..
+    fi
 
     # check if a script exited with an error
     if [ "${status[$i]}" != 0 ]; then
@@ -137,8 +170,6 @@ while [  $i -lt ${#tests[@]} ]; do
         ((pass++))
         printf "#### Test passed: $t\n"
     fi
-
-    cd ..
 
     ((i++))
 done
