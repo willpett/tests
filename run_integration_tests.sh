@@ -169,9 +169,9 @@ while [  $i -lt ${#tests[@]} ]; do
         fi
 
         cd ..
-
-        ((i++))
     fi
+
+    ((i++))
 done
 
 
