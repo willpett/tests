@@ -55,11 +55,12 @@ status=()
 for t in revbayes.github.io/tutorials/*/test.sh; do
     testname=`echo $t | cut -d '/' -f 2-3`
     dirname=`echo $t | cut -d '/' -f 1-3`
-
+    
     cd $dirname
 
     tests+=($testname)
 
+    printf "\n\n#### Running test: $testname\n\n"
     sh test.sh
     res="$?"
     if [ $res = 1 ]; then
@@ -151,29 +152,29 @@ while [  $i -lt ${#tests[@]} ]; do
             fi
         done
 
-        # check if a script exited with an error
-        if [ "${status[$i]}" != 0 ]; then
-            errs=("${status[$i]}")
-        fi
-
-        # failure if we have an error message
-        if [ ${#errs[@]} -gt 0 ]; then
-            if [ -f XFAIL ] ; then
-                ((xfailed++))
-                printf ">>>> Test failed: $t (expected)\n"
-            else
-                ((failed++))
-                printf ">>>> Test failed: $t\n"
-            fi
-            for errmsg in "${errs[@]}"; do
-                printf "\t$errmsg\n"
-            done
-        else
-            ((pass++))
-            printf "#### Test passed: $t\n"
-        fi
-
         cd ..
+    fi
+    
+    # check if a script exited with an error
+    if [ "${status[$i]}" != 0 ]; then
+        errs=("${status[$i]}")
+    fi
+
+    # failure if we have an error message
+    if [ ${#errs[@]} -gt 0 ]; then
+        if [ -f XFAIL ] ; then
+            ((xfailed++))
+            printf ">>>> Test failed: $t (expected)\n"
+        else
+            ((failed++))
+            printf ">>>> Test failed: $t\n"
+        fi
+        for errmsg in "${errs[@]}"; do
+            printf "\t$errmsg\n"
+        done
+    else
+        ((pass++))
+        printf "#### Test passed: $t\n"
     fi
 
     ((i++))
