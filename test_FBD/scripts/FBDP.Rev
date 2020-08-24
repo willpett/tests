@@ -250,19 +250,19 @@ monitors = VectorMonitors()
 
 # Create a vector of monitors #
 # 1. for the full model #
-monitors.append( mnModel(filename="output/FBDP.log", printgen=10) )
+monitors.append( mnModel(filename="output/FBDP.log", printgen=1) )
 
 # 2. the tree #
-monitors.append( mnFile(filename="output/FBDP.trees", printgen=10, pruned_tree) )
+monitors.append( mnFile(filename="output/FBDP.trees", printgen=1, pruned_tree) )
 
 # 3. and a few select parameters to be printed to the screen #
-monitors.append( mnScreen(printgen=10, age_extant, num_samp_anc, origin_time) )
+monitors.append( mnScreen(printgen=1000, age_extant, num_samp_anc, origin_time) )
 
 # Initialize the MCMC object #
-mymcmc = mcmc(mymodel, monitors, moves)
+mymcmc = mcmc(mymodel, monitors, moves, moveschedule="single")
 
 # Run the MCMC #
-mymcmc.run(generations=100)
+mymcmc.run(generations=30000)
 
 # Quit RevBayes #
 q()
