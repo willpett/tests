@@ -52,32 +52,34 @@ fi
 tests=()
 status=()
 
-for t in revbayes.github.io/tutorials/*/test.sh; do
-    testname=`echo $t | cut -d '/' -f 2-3`
-    dirname=`echo $t | cut -d '/' -f 1-3`
-    
-    cd $dirname
+if [ -d revbayes.github.io ]; then
+    for t in revbayes.github.io/tutorials/*/test.sh; do
+        testname=`echo $t | cut -d '/' -f 2-3`
+        dirname=`echo $t | cut -d '/' -f 1-3`
+        
+        cd $dirname
 
-    tests+=($testname)
+        tests+=($testname)
 
-    printf "\n\n#### Running test: $testname\n\n"
-    sh test.sh
-    res="$?"
-    if [ $res = 1 ]; then
-        res="error: $f"
-        break
-    elif [ $res = 139 ]; then
-        res="segfault: $f"
-        break
-    elif [ $res != 0 ]; then
-        res="error $res: $f"
-        break
-    fi
+        printf "\n\n#### Running test: $testname\n\n"
+        sh test.sh
+        res="$?"
+        if [ $res = 1 ]; then
+            res="error: $f"
+            break
+        elif [ $res = 139 ]; then
+            res="segfault: $f"
+            break
+        elif [ $res != 0 ]; then
+            res="error $res: $f"
+            break
+        fi
 
-    status+=("$res")
+        status+=("$res")
 
-    cd -
-done
+        cd -
+    done
+fi
 
 for t in test_*; do
     testname=`echo $t | cut -d _ -f 2-`
