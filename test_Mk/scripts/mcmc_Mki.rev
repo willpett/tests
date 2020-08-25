@@ -46,15 +46,15 @@ mymodel = model(phylogeny)
 # run MCMC #
 
 # some minitors
-monitors.append( mnScreen(printgen=1) )
+monitors.append( mnScreen(printgen=1000) )
 monitors.append( mnModel(filename="output/Mki.log", printgen=1) )
 monitors.append( mnFile(filename="output/Mki.trees", printgen=1, phylogeny) )
 
 # initialize the MCMC object
-mymcmc = mcmc(mymodel, moves, monitors)
+mymcmc = mcmc(mymodel, moves, monitors, moveschedule="single")
 
 # run the MCMC
-mymcmc.run(generations=10)
+mymcmc.run(generations=30000)
 
 #################
 # quit RevBayes #
